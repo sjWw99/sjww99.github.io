@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="sjWw (Серёжа): скрипты на Denizen, программы на C#, Kotlin.">
+<title>sjWw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column of ice, hero splits into name + .dsc script card; snow falls behind everything */
+:root {
+  --bg: #edf4f9;
+  --bg-deep: #dce9f2;
+  --surface: rgba(255,255,255,.72);
+  --fg: #0f2333;
+  --muted: #4f6b80;
+  --accent: #1f74ad;
+  --ice: #8cc8ec;
+  --line: rgba(31,116,173,.18);
+  --snow: 160,200,228;
+  --code-bg: #0e1f2d;
+  --code-fg: #d7ecf8;
+  --code-key: #8fd3ff;
+  --code-str: #b9f0e0;
+  --code-dim: #6f8ea4;
+  --font-display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07121b; --bg-deep: #0b1c2a; --surface: rgba(16,36,52,.72);
+    --fg: #e4f1fa; --muted: #8ba8bd; --accent: #7fcdfb; --ice: #3f86b4;
+    --line: rgba(127,205,251,.16); --snow: 225,242,255;
+    --code-bg: #0a1a27; --code-fg: #d7ecf8; --code-key: #8fd3ff; --code-str: #b9f0e0; --code-dim: #5f7f95;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #07121b; --bg-deep: #0b1c2a; --surface: rgba(16,36,52,.72);
+  --fg: #e4f1fa; --muted: #8ba8bd; --accent: #7fcdfb; --ice: #3f86b4;
+  --line: rgba(127,205,251,.16); --snow: 225,242,255;
+  --code-bg: #0a1a27; --code-fg: #d7ecf8; --code-key: #8fd3ff; --code-str: #b9f0e0; --code-dim: #5f7f95;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#snow { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 980px; margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+/* Top bar */
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 22px;
+}
+.mark { font-family: var(--font-mono); font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.mark b { color: var(--accent); font-weight: 600; }
+.lang {
+  display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px;
+  background: var(--surface); backdrop-filter: blur(8px);
+}
+.lang button {
+  font: 600 12px/1 var(--font-mono); letter-spacing: .08em;
+  border: 0; background: transparent; color: var(--muted);
+  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+}
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+.lang button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Hero */
+.hero {
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: center;
+  padding-block: 48px 72px;
+}
+.hero > * { min-width: 0; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(64px, 13vw, 132px); line-height: .92; letter-spacing: -.04em;
+  margin: 14px 0 10px;
+  background: linear-gradient(165deg, var(--fg) 30%, var(--accent) 70%, var(--ice) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.aka { font-family: var(--font-display); font-weight: 400; font-size: 22px; color: var(--muted); margin: 0 0 22px; }
+.aka span { color: var(--fg); }
+.lead { font-size: 18px; max-width: 34ch; margin: 0; text-wrap: pretty; }
+
+.script {
+  background: var(--code-bg); color: var(--code-fg);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 30px 60px -30px rgba(10,40,70,.45), inset 0 0 0 1px rgba(140,200,236,.14);
+  transform: rotate(1.2deg);
+}
+.script header {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  border-bottom: 1px solid rgba(140,200,236,.12);
+  font: 12px var(--font-mono); color: var(--code-dim);
+}
+.script header i { width: 9px; height: 9px; border-radius: 50%; background: rgba(140,200,236,.25); display: inline-block; }
+.script pre {
+  margin: 0; padding: 18px 18px 22px; overflow-x: auto;
+  font: 13px/1.75 var(--font-mono);
+}
+.k { color: var(--code-key); } .s { color: var(--code-str); } .c { color: var(--code-dim); }
+
+/* Sections */
+section.block { padding-block: 56px; border-top: 1px solid var(--line); }
+.block-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+h2 {
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 4vw, 34px);
+  letter-spacing: -.02em; margin: 0; text-wrap: balance;
+}
+.tag { font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+
+.stack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tool {
+  background: var(--surface); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); border-radius: 16px; padding: 22px;
+  display: flex; flex-direction: column; gap: 10px; min-width: 0;
+}
+.tool .ext { font-family: var(--font-mono); font-size: 13px; color: var(--accent); }
+.tool h3 { font-family: var(--font-display); font-weight: 600; font-size: 20px; margin: 0; }
+.tool p { margin: 0; color: var(--muted); font-size: 15px; }
+.status {
+  margin-top: auto; align-self: flex-start;
+  font: 600 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase;
+  padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg);
+}
+.status.learning { border-style: dashed; color: var(--accent); }
+
+.roles { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.role {
+  display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: baseline;
+  padding-block: 20px; border-bottom: 1px dashed var(--line);
+}
+.role:last-child { border-bottom: 0; }
+.role .server { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
+.role .what { color: var(--muted); }
+.role .what strong { color: var(--fg); font-weight: 700; }
+
+.project {
+  border: 1.5px dashed var(--ice); border-radius: 18px; padding: 32px;
+  display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+  background: var(--surface);
+}
+.project svg { width: 56px; height: 56px; color: var(--accent); }
+.project h3 { font-family: var(--font-display); font-weight: 600; font-size: 22px; margin: 0 0 6px; }
+.project p { margin: 0; color: var(--muted); }
+
+.contacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.contact { display: flex; flex-direction: column; gap: 4px; padding-block: 8px; }
+.contact .lbl { font: 12px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.contact .val { font-family: var(--font-display); font-size: 24px; color: var(--fg); }
+
+footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px var(--font-mono); color: var(--muted); }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding-block: 24px 48px; }
+  .script { transform: none; }
+  .stack, .contacts { grid-template-columns: 1fr; }
+  .role { grid-template-columns: 1fr; gap: 4px; }
+  .project { grid-template-columns: 1fr; padding: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .script { transform: none; } }
+</style>
+</head>
+<body>
+
+<canvas id="snow" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <div class="bar">
+    <div class="mark"><b>❄</b> sjww</div>
+    <div class="lang" role="group" aria-label="Language">
+      <button id="lang-ru" type="button" data-lang="ru" aria-pressed="true">RU</button>
+      <button id="lang-en" type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow" data-i18n="eyebrow">Разработчик · Minecraft-сервера</div>
+      <h1>sjWw</h1>
+      <p class="aka" data-i18n="aka">он же <span>Серёжа</span></p>
+      <p class="lead" data-i18n="lead">Пишу скрипты на Denizen, делаю программы на C# и сейчас осваиваю Kotlin. Люблю лёд, зиму и аккуратный код.</p>
+    </div>
+    <div class="script" aria-label="Denizen script">
+      <header><i></i><i></i><i></i>&nbsp; sjww.dsc</header>
+<pre><span class="k">sjww_hello:</span>
+    <span class="k">type:</span> world
+    <span class="k">events:</span>
+        <span class="k">on player joins:</span>
+        <span class="c">- narrate</span> <span class="s" data-i18n="code">"&lt;&amp;b&gt;Привет! Я Серёжа ❄"</span>
+        <span class="c">- playsound</span> &lt;player&gt; sound:block_glass_break
+        <span class="c">- flag</span> &lt;player&gt; met_sjww</pre>
+    </div>
+  </header>
+
+  <section class="block" id="stack">
+    <div class="block-head">
+      <h2 data-i18n="stackTitle">Чем занимаюсь</h2>
+      <span class="tag">.dsc · .cs · .kt</span>
+    </div>
+    <div class="stack">
+      <article class="tool">
+        <span class="ext">.dsc</span>
+        <h3>Denizen</h3>
+        <p data-i18n="denizen">Скрипты для Minecraft-серверов: команды, меню, ивенты, предметы и экономика.</p>
+        <span class="status" data-i18n="active">Пишу</span>
+      </article>
+      <article class="tool">
+        <span class="ext">.cs</span>
+        <h3>C#</h3>
+        <p data-i18n="csharp">Программы и утилиты для себя и для других.</p>
+        <span class="status" data-i18n="active2">Пишу</span>
+      </article>
+      <article class="tool">
+        <span class="ext">.kt</span>
+        <h3>Kotlin</h3>
+        <p data-i18n="kotlin">Разбираюсь в языке и в плагинах под Paper.</p>
+        <span class="status learning" data-i18n="learning">Изучаю</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="experience">
+    <div class="block-head">
+      <h2 data-i18n="expTitle">Опыт на серверах</h2>
+      <span class="tag" data-i18n="expTag">Команды проектов</span>
+    </div>
+    <ul class="roles">
+      <li class="role">
+        <span class="server">Ichorix</span>
+        <span class="what" data-i18n="ichorix"><strong>Модератор.</strong> Следил за порядком в чате и на сервере, помогал игрокам.</span>
+      </li>
+      <li class="role">
+        <span class="server">GrateCraft</span>
+        <span class="what" data-i18n="gratecraft"><strong>Администратор.</strong> Отвечал за работу сервера и команду модерации.</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="block" id="projects">
+    <div class="block-head">
+      <h2 data-i18n="projTitle">Проекты</h2>
+      <span class="tag">1 / soon</span>
+    </div>
+    <div class="project">
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M24 4v40M6.7 14l34.6 20M6.7 34l34.6-20"/>
+        <path d="M24 10l-4-4M24 10l4-4M24 38l-4 4M24 38l4 4"/>
+      </svg>
+      <div>
+        <h3 data-i18n="projName">Программа на C#</h3>
+        <p data-i18n="projText">Описание, скриншоты и ссылка на загрузку появятся здесь совсем скоро.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="contacts">
+    <div class="block-head">
+      <h2 data-i18n="contactTitle">Контакты</h2>
+    </div>
+    <div class="contacts">
+      <div class="contact"><span class="lbl">Telegram</span><span class="val">—</span></div>
+      <div class="contact"><span class="lbl">Discord</span><span class="val">—</span></div>
+      <div class="contact"><span class="lbl">GitHub</span><span class="val">—</span></div>
+    </div>
+  </section>
+
+  <footer data-i18n="footer">© 2026 sjWw · сделано изо льда и кода</footer>
+</div>
+
+<script>
+(function () {
+  var dict = {
+    ru: {
+      eyebrow: "Разработчик · Minecraft-сервера",
+      aka: "он же <span>Серёжа</span>",
+      lead: "Пишу скрипты на Denizen, делаю программы на C# и сейчас осваиваю Kotlin. Люблю лёд, зиму и аккуратный код.",
+      code: "\"&lt;&amp;b&gt;Привет! Я Серёжа ❄\"",
+      stackTitle: "Чем занимаюсь",
+      denizen: "Скрипты для Minecraft-серверов: команды, меню, ивенты, предметы и экономика.",
+      csharp: "Программы и утилиты для себя и для других.",
+      kotlin: "Разбираюсь в языке и в плагинах под Paper.",
+      active: "Пишу", active2: "Пишу", learning: "Изучаю",
+      expTitle: "Опыт на серверах", expTag: "Команды проектов",
+      ichorix: "<strong>Модератор.</strong> Следил за порядком в чате и на сервере, помогал игрокам.",
+      gratecraft: "<strong>Администратор.</strong> Отвечал за работу сервера и команду модерации.",
+      projTitle: "Проекты", projName: "Программа на C#",
+      projText: "Описание, скриншоты и ссылка на загрузку появятся здесь совсем скоро.",
+      contactTitle: "Контакты",
+      footer: "© 2026 sjWw · сделано изо льда и кода"
+    },
+    en: {
+      eyebrow: "Developer · Minecraft servers",
+      aka: "also known as <span>Seryozha</span>",
+      lead: "I write Denizen scripts, build programs in C# and I'm learning Kotlin right now. I love ice, winter and clean code.",
+      code: "\"&lt;&amp;b&gt;Hi! I'm Seryozha ❄\"",
+      stackTitle: "What I do",
+      denizen: "Scripts for Minecraft servers: commands, menus, events, items and economies.",
+      csharp: "Programs and utilities for myself and others.",
+      kotlin: "Getting to know the language and Paper plugins.",
+      active: "Writing", active2: "Writing", learning: "Learning",
+      expTitle: "Server experience", expTag: "Project teams",
+      ichorix: "<strong>Moderator.</strong> Kept order in chat and in game, helped players.",
+      gratecraft: "<strong>Administrator.</strong> Looked after the server and the moderation team.",
+      projTitle: "Projects", projName: "C# program",
+      projText: "Description, screenshots and a download link are coming here very soon.",
+      contactTitle: "Contacts",
+      footer: "© 2026 sjWw · made of ice and code"
+    }
+  };
+
+  function setLang(lang) {
+    var d = dict[lang] || dict.ru;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      if (d[key] != null) el.innerHTML = d[key];
+    });
+    document.querySelectorAll(".lang button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+    });
+    try { localStorage.setItem("sjww-lang", lang); } catch (e) {}
+  }
+
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.addEventListener("click", function () { setLang(b.dataset.lang); });
+  });
+  var saved = null;
+  try { saved = localStorage.getItem("sjww-lang"); } catch (e) {}
+  if (saved === "en") setLang("en");
+
+  /* Snowfall */
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var cv = document.getElementById("snow");
+  var ctx = cv.getContext("2d");
+  var flakes = [], W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function snowColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--snow").trim() || "200,225,245";
+  }
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(Math.min(140, W * H / 9000));
+    flakes = [];
+    for (var i = 0; i < n; i++) flakes.push(make(true));
+  }
+  function make(anywhere) {
+    var r = Math.random() * 2.6 + .6;
+    return { x: Math.random() * W, y: anywhere ? Math.random() * H : -6, r: r,
+             vy: r * .35 + .25, sway: Math.random() * Math.PI * 2, a: Math.random() * .5 + .35 };
+  }
+  function draw() {
+    var c = snowColor();
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < flakes.length; i++) {
+      var f = flakes[i];
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(" + c + "," + f.a + ")";
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  function step() {
+    for (var i = 0; i < flakes.length; i++) {
+      var f = flakes[i];
+      f.sway += .01;
+      f.y += f.vy;
+      f.x += Math.sin(f.sway) * .35;
+      if (f.y > H + 6) flakes[i] = make(false);
+    }
+    draw();
+    requestAnimationFrame(step);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+  if (reduce) draw(); else requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>
