@@ -157,8 +157,15 @@ h2 {
 }
 .role:last-child { border-bottom: 0; }
 .role .server { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
-.role .what { color: var(--muted); }
-.role .what strong { color: var(--fg); font-weight: 700; }
+.role .what { color: var(--muted); min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.role .what p { margin: 0; max-width: 60ch; }
+.path { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.path span {
+  font: 600 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase;
+  padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg);
+}
+.path span.top { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.path b { font: 400 13px var(--font-mono); color: var(--muted); }
 
 .project {
   border: 1.5px dashed var(--ice); border-radius: 18px; padding: 32px;
@@ -253,11 +260,17 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
     <ul class="roles">
       <li class="role">
         <span class="server">Ichorix</span>
-        <span class="what" data-i18n="ichorix"><strong>Модератор.</strong> Следил за порядком в чате и на сервере, помогал игрокам.</span>
+        <div class="what">
+          <div class="path" data-i18n="ichorixPath"><span>Модератор</span><b aria-hidden="true">→</b><span class="top">Старший модератор</span></div>
+          <p data-i18n="ichorix">Начинал модератором: следил за порядком в чате и на сервере, помогал игрокам. Со временем дорос до старшего модератора.</p>
+        </div>
       </li>
       <li class="role">
         <span class="server">GrateCraft</span>
-        <span class="what" data-i18n="gratecraft"><strong>Администратор.</strong> Отвечал за работу сервера и команду модерации.</span>
+        <div class="what">
+          <div class="path" data-i18n="gratecraftPath"><span>Модератор</span><b aria-hidden="true">→</b><span>Администратор</span><b aria-hidden="true">+</b><span class="top">Скриптёр</span></div>
+          <p data-i18n="gratecraft">Прошёл путь от модератора до администратора и отвечал за работу сервера. Параллельно писал для него скрипты.</p>
+        </div>
       </li>
     </ul>
   </section>
@@ -307,8 +320,10 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
       kotlin: "Разбираюсь в языке и в плагинах под Paper.",
       active: "Пишу", active2: "Пишу", learning: "Изучаю",
       expTitle: "Опыт на серверах", expTag: "Команды проектов",
-      ichorix: "<strong>Модератор.</strong> Следил за порядком в чате и на сервере, помогал игрокам.",
-      gratecraft: "<strong>Администратор.</strong> Отвечал за работу сервера и команду модерации.",
+      ichorixPath: '<span>Модератор</span><b aria-hidden="true">→</b><span class="top">Старший модератор</span>',
+      ichorix: "Начинал модератором: следил за порядком в чате и на сервере, помогал игрокам. Со временем дорос до старшего модератора.",
+      gratecraftPath: '<span>Модератор</span><b aria-hidden="true">→</b><span>Администратор</span><b aria-hidden="true">+</b><span class="top">Скриптёр</span>',
+      gratecraft: "Прошёл путь от модератора до администратора и отвечал за работу сервера. Параллельно писал для него скрипты.",
       projTitle: "Проекты", projName: "Программа на C#",
       projText: "Описание, скриншоты и ссылка на загрузку появятся здесь совсем скоро.",
       contactTitle: "Контакты",
@@ -325,8 +340,10 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
       kotlin: "Getting to know the language and Paper plugins.",
       active: "Writing", active2: "Writing", learning: "Learning",
       expTitle: "Server experience", expTag: "Project teams",
-      ichorix: "<strong>Moderator.</strong> Kept order in chat and in game, helped players.",
-      gratecraft: "<strong>Administrator.</strong> Looked after the server and the moderation team.",
+      ichorixPath: '<span>Moderator</span><b aria-hidden="true">→</b><span class="top">Senior moderator</span>',
+      ichorix: "Started as a moderator: kept order in chat and in game and helped players. Over time I was promoted to senior moderator.",
+      gratecraftPath: '<span>Moderator</span><b aria-hidden="true">→</b><span>Administrator</span><b aria-hidden="true">+</b><span class="top">Scripter</span>',
+      gratecraft: "Went from moderator to administrator and looked after the server. Along the way I also wrote scripts for it.",
       projTitle: "Projects", projName: "C# program",
       projText: "Description, screenshots and a download link are coming here very soon.",
       contactTitle: "Contacts",
