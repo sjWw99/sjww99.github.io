@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="sjWw (Серёжа): скрипты на Denizen, программы на C#, Kotlin.">
+<meta name="description" content="sjWw: скрипты на Denizen, программы, Kotlin.">
 <title>sjWw</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,12 +99,10 @@ body {
 h1 {
   font-family: var(--font-display); font-weight: 800;
   font-size: clamp(64px, 13vw, 132px); line-height: .92; letter-spacing: -.04em;
-  margin: 14px 0 10px;
+  margin: 14px 0 24px;
   background: linear-gradient(165deg, var(--fg) 30%, var(--accent) 70%, var(--ice) 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.aka { font-family: var(--font-display); font-weight: 400; font-size: 22px; color: var(--muted); margin: 0 0 22px; }
-.aka span { color: var(--fg); }
 .lead { font-size: 18px; max-width: 34ch; margin: 0; text-wrap: pretty; }
 
 .script {
@@ -168,13 +166,28 @@ h2 {
 .path b { font: 400 13px var(--font-mono); color: var(--muted); }
 
 .project {
-  border: 1.5px dashed var(--ice); border-radius: 18px; padding: 32px;
-  display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
-  background: var(--surface);
+  border: 1px solid var(--line); border-radius: 18px; padding: 28px 32px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px;
+  background: var(--surface); backdrop-filter: blur(10px);
 }
-.project svg { width: 56px; height: 56px; color: var(--accent); }
-.project h3 { font-family: var(--font-display); font-weight: 600; font-size: 22px; margin: 0 0 6px; }
-.project p { margin: 0; color: var(--muted); }
+.project-top { display: flex; align-items: center; gap: 18px; }
+.project svg { width: 52px; height: 52px; color: var(--accent); flex: none; }
+.project-title { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.project h3 { font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 4vw, 34px); letter-spacing: -.02em; margin: 0; }
+.edition { font: 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.project-desc { margin: 0; color: var(--fg); font-size: 17px; max-width: 62ch; }
+.features {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 28px;
+}
+.features li { position: relative; padding-left: 22px; color: var(--muted); font-size: 15px; }
+.features li::before { content: "❄"; position: absolute; left: 0; top: 0; color: var(--ice); font-size: 13px; }
+.download {
+  font: 600 14px/1 var(--font-body); text-decoration: none;
+  background: var(--accent); color: var(--bg); padding: 13px 20px; border-radius: 999px;
+}
+.download:hover { filter: brightness(1.08); }
+.note { font: 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
 
 .contacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .contact { display: flex; flex-direction: column; gap: 4px; padding-block: 8px; }
@@ -188,7 +201,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
   .script { transform: none; }
   .stack, .contacts { grid-template-columns: 1fr; }
   .role { grid-template-columns: 1fr; gap: 4px; }
-  .project { grid-template-columns: 1fr; padding: 24px; }
+  .project { padding: 22px; }
 }
 @media (prefers-reduced-motion: reduce) { .script { transform: none; } }
 </style>
@@ -210,7 +223,6 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
     <div>
       <div class="eyebrow" data-i18n="eyebrow">Разработчик · Minecraft-сервера</div>
       <h1>sjWw</h1>
-      <p class="aka" data-i18n="aka">он же <span>Серёжа</span></p>
       <p class="lead" data-i18n="lead">Пишу скрипты на Denizen, делаю программы на C# и сейчас осваиваю Kotlin. Люблю лёд, зиму и аккуратный код.</p>
     </div>
     <div class="script" aria-label="Denizen script">
@@ -219,7 +231,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
     <span class="k">type:</span> world
     <span class="k">events:</span>
         <span class="k">on player joins:</span>
-        <span class="c">- narrate</span> <span class="s" data-i18n="code">"&lt;&amp;b&gt;Привет! Я Серёжа ❄"</span>
+        <span class="c">- narrate</span> <span class="s" data-i18n="code">"&lt;&amp;b&gt;Привет! Это sjWw ❄"</span>
         <span class="c">- playsound</span> &lt;player&gt; sound:block_glass_break
         <span class="c">- flag</span> &lt;player&gt; met_sjww</pre>
     </div>
@@ -278,18 +290,19 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
   <section class="block" id="projects">
     <div class="block-head">
       <h2 data-i18n="projTitle">Проекты</h2>
-      <span class="tag">1 / soon</span>
     </div>
-    <div class="project">
-      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-        <path d="M24 4v40M6.7 14l34.6 20M6.7 34l34.6-20"/>
-        <path d="M24 10l-4-4M24 10l4-4M24 38l-4 4M24 38l4 4"/>
-      </svg>
-      <div>
-        <h3 data-i18n="projName">Программа на C#</h3>
-        <p data-i18n="projText">Описание, скриншоты и ссылка на загрузку появятся здесь совсем скоро.</p>
+    <article class="project">
+      <div class="project-top">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M24 4v40M6.7 14l34.6 20M6.7 34l34.6-20"/>
+          <path d="M24 10l-4-4M24 10l4-4M24 38l-4 4M24 38l4 4"/>
+        </svg>
+        <h3>AntiSaver</h3>
       </div>
-    </div>
+      <div class="project-actions">
+        <a class="download" href="AntiSaver.exe" download data-i18n="projDownload">Скачать AntiSaver.exe</a>
+      </div>
+    </article>
   </section>
 
   <section class="block" id="contacts">
@@ -311,9 +324,8 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
   var dict = {
     ru: {
       eyebrow: "Разработчик · Minecraft-сервера",
-      aka: "он же <span>Серёжа</span>",
       lead: "Пишу скрипты на Denizen, делаю программы на C# и сейчас осваиваю Kotlin. Люблю лёд, зиму и аккуратный код.",
-      code: "\"&lt;&amp;b&gt;Привет! Я Серёжа ❄\"",
+      code: "\"&lt;&amp;b&gt;Привет! Это sjWw ❄\"",
       stackTitle: "Чем занимаюсь",
       denizen: "Скрипты для Minecraft-серверов: команды, меню, ивенты, предметы и экономика.",
       csharp: "Программы и утилиты для себя и для других.",
@@ -324,16 +336,15 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
       ichorix: "Начинал модератором: следил за порядком в чате и на сервере, помогал игрокам. Со временем дорос до старшего модератора.",
       gratecraftPath: '<span>Модератор</span><b aria-hidden="true">→</b><span>Администратор</span><b aria-hidden="true">+</b><span class="top">Скриптёр</span>',
       gratecraft: "Прошёл путь от модератора до администратора и отвечал за работу сервера. Параллельно писал для него скрипты.",
-      projTitle: "Проекты", projName: "Программа на C#",
-      projText: "Описание, скриншоты и ссылка на загрузку появятся здесь совсем скоро.",
+      projTitle: "Проекты",
+      projDownload: "Скачать AntiSaver.exe",
       contactTitle: "Контакты",
       footer: "© 2026 sjWw · сделано изо льда и кода"
     },
     en: {
       eyebrow: "Developer · Minecraft servers",
-      aka: "also known as <span>Seryozha</span>",
       lead: "I write Denizen scripts, build programs in C# and I'm learning Kotlin right now. I love ice, winter and clean code.",
-      code: "\"&lt;&amp;b&gt;Hi! I'm Seryozha ❄\"",
+      code: "\"&lt;&amp;b&gt;Hi! It's sjWw ❄\"",
       stackTitle: "What I do",
       denizen: "Scripts for Minecraft servers: commands, menus, events, items and economies.",
       csharp: "Programs and utilities for myself and others.",
@@ -344,8 +355,8 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); font: 12px
       ichorix: "Started as a moderator: kept order in chat and in game and helped players. Over time I was promoted to senior moderator.",
       gratecraftPath: '<span>Moderator</span><b aria-hidden="true">→</b><span>Administrator</span><b aria-hidden="true">+</b><span class="top">Scripter</span>',
       gratecraft: "Went from moderator to administrator and looked after the server. Along the way I also wrote scripts for it.",
-      projTitle: "Projects", projName: "C# program",
-      projText: "Description, screenshots and a download link are coming here very soon.",
+      projTitle: "Projects",
+      projDownload: "Download AntiSaver.exe",
       contactTitle: "Contacts",
       footer: "© 2026 sjWw · made of ice and code"
     }
